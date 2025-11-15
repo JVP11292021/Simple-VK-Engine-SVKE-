@@ -1,0 +1,88 @@
+workspace "Engine"
+	architecture "x64"
+	startproject "Engine"
+
+	configurations {
+		"Debug",
+		"Release",
+		"Dist"
+	}
+
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+local vulkan_sdk = os.getenv("VULKAN_SDK")
+if vulkan_sdk == nil then
+    print("[Engine] WARNING: VULKAN_SDK environment variable not set!")
+    print("          Vulkan will NOT be included in the build.")
+else
+    print("[Engine] Using Vulkan SDK at: " .. vulkan_sdk)
+end
+
+project "Engine"
+	location "Engine"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "on"
+
+	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+	files {
+		"%{prj.name}/**.h",
+		"%{prj.name}/**.hpp",
+		"%{prj.name}/**.inl",
+		"%{prj.name}/**.cpp",
+		"%{prj.name}/**.c",
+	}
+
+	includedirs {
+		"Libraries/include",
+	}
+
+	libdirs {
+		"Libraries/lib",
+	}
+
+	links {
+		"glfw3_mt.lib"
+	}
+
+	defines {
+		"SVKE_BUILD_DLL",
+	}
+
+	if vulkan_sdk ~= nil then
+        includedirs {
+            vulkan_sdk .. "/Include"
+        }
+
+        libdirs {
+            vulkan_sdk .. "/Lib"
+        }
+
+        links {
+            "vulkan-1.lib"
+        }
+
+        defines {
+            "USE_VULKAN"
+        }
+    end
+
+	filter "system:windows"
+		systemversion "latest"
+
+	filter "configurations:Debug"
+		defines "SVKE_DEBUG"
+		symbols "on"
+		runtime "Debug"
+
+	filter "configurations:Release"
+		defines "SVKE_RELEASE"
+		optimize "on"
+		runtime "Release"
+
+	filter "configurations:Dist"
+		defines "SVKE_DIST"
+		optimize "on"
+		runtime "Release"
