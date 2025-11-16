@@ -48,7 +48,7 @@ project "Engine"
 	}
 
 	defines {
-		"SVKE_BUILD_DLL",
+		"VLE_BUILD_DLL",
 	}
 
 	if vulkan_sdk ~= nil then
@@ -73,16 +73,16 @@ project "Engine"
 		systemversion "latest"
 
 	filter "configurations:Debug"
-		defines "SVKE_DEBUG"
+		defines "VLE_DEBUG"
 		symbols "on"
 		runtime "Debug"
 
 	filter "configurations:Release"
-		defines "SVKE_RELEASE"
+		defines "VLE_RELEASE"
 		optimize "on"
 		runtime "Release"
 
 	filter "configurations:Dist"
-		defines "SVKE_DIST"
+		defines "VLE_DIST"
 		optimize "on"
 		runtime "Release"

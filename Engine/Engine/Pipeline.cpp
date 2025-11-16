@@ -36,12 +36,6 @@ PipelineConfInfo Pipeline::defaultPipelineConfigInfo(std::uint32_t w, std::uint3
 	configInfo.scissor.offset = { 0, 0 };
 	configInfo.scissor.extent = { w, h };
 
-	configInfo.viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-	configInfo.viewportInfo.viewportCount = 1;
-	configInfo.viewportInfo.pViewports = &configInfo.viewport;
-	configInfo.viewportInfo.scissorCount = 1;
-	configInfo.viewportInfo.pScissors = &configInfo.scissor;
-
 	configInfo.rasterizationInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	configInfo.rasterizationInfo.depthClampEnable = VK_FALSE;
 	configInfo.rasterizationInfo.rasterizerDiscardEnable = VK_FALSE;
@@ -120,8 +114,8 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 
 	assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
 		"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
-	assert(configInfo.renderPass != VK_NULL_HANDLE && 
-		"Cannot create graphics pipeline:: no renderPass provided in configInfo")
+	assert(configInfo.renderPass != VK_NULL_HANDLE &&
+		"Cannot create graphics pipeline:: no renderPass provided in configInfo");
 
 	this->createShaderModule(vertCode, &this->_vertShaderModule);
 	this->createShaderModule(fragCode, &this->_fragShaderModule);
@@ -152,6 +146,13 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	vertexInputInfo.pVertexAttributeDescriptions = nullptr;
 	vertexInputInfo.pVertexBindingDescriptions = nullptr;
 
+	VkPipelineViewportStateCreateInfo viewportInfo{};
+	viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+	viewportInfo.viewportCount = 1;
+	viewportInfo.pViewports = &configInfo.viewport;
+	viewportInfo.scissorCount = 1;
+	viewportInfo.pScissors = &configInfo.scissor;
+
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
@@ -159,7 +160,7 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
 
 	pipelineInfo.pInputAssemblyState = &configInfo.assemblyInputInfo;
-	pipelineInfo.pViewportState = &configInfo.viewportInfo;
+	pipelineInfo.pViewportState = &viewportInfo;
 	pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
 	pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
 	pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;

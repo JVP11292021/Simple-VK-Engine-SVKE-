@@ -12,7 +12,6 @@ VLE_NS_B
 struct PipelineConfInfo {
 	VkViewport viewport;
 	VkRect2D scissor;
-	VkPipelineViewportStateCreateInfo viewportInfo;
 	VkPipelineInputAssemblyStateCreateInfo assemblyInputInfo;
 	VkPipelineRasterizationStateCreateInfo rasterizationInfo;
 	VkPipelineMultisampleStateCreateInfo multisampleInfo;

@@ -19,6 +19,7 @@ public:
 	EngineWindow& operator=(const EngineWindow&) = delete;
 
 	inline bool shouldClose() { return glfwWindowShouldClose(this->_win); }
+	inline VkExtent2D getExtent() const { return { static_cast<std::uint32_t>(this->_width), static_cast<std::uint32_t>(this->_height) }; }
 
 	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
