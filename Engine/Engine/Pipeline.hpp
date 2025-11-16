@@ -26,18 +26,19 @@ struct PipelineConfInfo {
 
 class Pipeline {
 public:
-	explicit Pipeline(EngineDevice& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& conf);
-	~Pipeline() {}
+	explicit Pipeline(EngineDevice& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& configInfo);
+	~Pipeline();
 
 	Pipeline(const Pipeline&) = delete;
 	void operator=(const Pipeline&) = delete;
 
 	static PipelineConfInfo defaultPipelineConfigInfo(std::uint32_t w, std::uint32_t h);
 
+
 private:
 	static std::vector<char> readFile(const std::string& path);
 
-	void createGfxPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& config);
+	void createGfxPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& configInfo);
 	void createShaderModule(std::vector<char>& code, VkShaderModule* shaderModule);
 
 private: 
