@@ -2,6 +2,7 @@
 
 #include "defs.hpp"
 #include "Window.hpp"
+#include "Pipeline.hpp"
 
 class FirstApp {
 public:
@@ -16,6 +17,7 @@ public:
 private:
 	
 	lve::EngineWindow win{WIDTH, HEIGHT, "Hello Vulkan"};
+	lve::Pipeline pipeline{ "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv" };
 };
 
 int main() {
