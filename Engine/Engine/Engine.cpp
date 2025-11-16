@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Device.hpp"
 #include "defs.hpp"
 #include "Window.hpp"
 #include "Pipeline.hpp"
@@ -15,9 +16,9 @@ public:
 		}
 	}
 private:
-	
-	lve::EngineWindow win{WIDTH, HEIGHT, "Hello Vulkan"};
-	lve::Pipeline pipeline{ "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv" };
+	vle::EngineWindow win{WIDTH, HEIGHT, "Hello Vulkan"};
+	vle::EngineDevice device{ win };
+	vle::Pipeline pipeline{ device, "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv", vle::Pipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT) };
 };
 
 int main() {

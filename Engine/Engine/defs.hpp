@@ -10,7 +10,7 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#define VLE_NS_B namespace lve {
+#define VLE_NS_B namespace vle {
 #define VLE_NS_E }
 
 #endif // VLE_DEFS_H

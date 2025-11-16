@@ -1,5 +1,5 @@
 #ifndef VLE_WINDOW_H
-#define SVKEVLE_WINDOW_H
+#define VLE_WINDOW_H
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -12,13 +12,15 @@ VLE_NS_B
 
 class EngineWindow {
 public:
-	explicit EngineWindow(std::int32_t w, std::int32_t h, std::string t);
+	 EngineWindow(std::int32_t w, std::int32_t h, std::string t);
 	~EngineWindow();
 
 	EngineWindow(const EngineWindow&) = delete;
 	EngineWindow& operator=(const EngineWindow&) = delete;
 
 	inline bool shouldClose() { return glfwWindowShouldClose(this->_win); }
+
+	void createWindowSurface(VkInstance instance, VkSurfaceKHR* surface);
 
 private:
 	void init();

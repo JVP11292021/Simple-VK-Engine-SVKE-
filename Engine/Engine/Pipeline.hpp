@@ -5,17 +5,46 @@
 #include <vector>
 
 #include "defs.hpp"
+#include "Device.hpp"
 
 VLE_NS_B
 
+struct PipelineConfInfo {
+	VkViewport viewport;
+	VkRect2D scissor;
+	VkPipelineViewportStateCreateInfo viewportInfo;
+	VkPipelineInputAssemblyStateCreateInfo assemblyInputInfo;
+	VkPipelineRasterizationStateCreateInfo rasterizationInfo;
+	VkPipelineMultisampleStateCreateInfo multisampleInfo;
+	VkPipelineColorBlendAttachmentState colorBlendAttachment;
+	VkPipelineColorBlendStateCreateInfo colorBlendInfo;
+	VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+	VkPipelineLayout pipelineLayout = nullptr;
+	VkRenderPass renderPass = nullptr;
+	uint32_t subpass = 0;
+};
+
 class Pipeline {
 public:
-	explicit Pipeline(const std::string& vertFilePath, const std::string& fragFilePath);
+	explicit Pipeline(EngineDevice& device, const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& conf);
+	~Pipeline() {}
+
+	Pipeline(const Pipeline&) = delete;
+	void operator=(const Pipeline&) = delete;
+
+	static PipelineConfInfo defaultPipelineConfigInfo(std::uint32_t w, std::uint32_t h);
 
 private:
 	static std::vector<char> readFile(const std::string& path);
 
-	void createGfxPipeline(const std::string& vertFilePath, const std::string& fragFilePath);
+	void createGfxPipeline(const std::string& vertFilePath, const std::string& fragFilePath, const PipelineConfInfo& config);
+	void createShaderModule(std::vector<char>& code, VkShaderModule* shaderModule);
+
+private: 
+	EngineDevice& _device;
+	VkPipeline _gfxPipeline;
+	VkShaderModule _vertShaderModule;
+	VkShaderModule _fragShaderModule;
 };
 
 VLE_NS_E
