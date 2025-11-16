@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <cassert>
 
 VLE_NS_B
 
@@ -117,6 +118,11 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	auto vertCode = this->readFile(vertFilePath);
 	auto fragCode = this->readFile(fragFilePath);
 
+	assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
+		"Cannot create graphics pipeline:: no pipelineLayout provided in configInfo");
+	assert(configInfo.renderPass != VK_NULL_HANDLE && 
+		"Cannot create graphics pipeline:: no renderPass provided in configInfo")
+
 	this->createShaderModule(vertCode, &this->_vertShaderModule);
 	this->createShaderModule(fragCode, &this->_fragShaderModule);
 
@@ -155,6 +161,7 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	pipelineInfo.pInputAssemblyState = &configInfo.assemblyInputInfo;
 	pipelineInfo.pViewportState = &configInfo.viewportInfo;
 	pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
+	pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
 	pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
 	pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
 	pipelineInfo.pDynamicState = nullptr;
