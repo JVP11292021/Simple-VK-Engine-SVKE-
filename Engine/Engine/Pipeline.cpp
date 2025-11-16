@@ -19,6 +19,11 @@ Pipeline::~Pipeline() {
 	vkDestroyPipeline(this->_device.device(), this->_gfxPipeline, nullptr);
 }
 
+void Pipeline::bind(VkCommandBuffer commandBuffer) {
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, this->_gfxPipeline);
+}
+
+
 PipelineConfInfo Pipeline::defaultPipelineConfigInfo(std::uint32_t w, std::uint32_t h) {
 	PipelineConfInfo configInfo{};
 
@@ -87,6 +92,9 @@ PipelineConfInfo Pipeline::defaultPipelineConfigInfo(std::uint32_t w, std::uint3
 	configInfo.depthStencilInfo.stencilTestEnable = VK_FALSE;
 	configInfo.depthStencilInfo.front = {};  // Optional
 	configInfo.depthStencilInfo.back = {};   // Optional
+
+	configInfo.pipelineLayout = nullptr;
+	configInfo.renderPass = nullptr;
 
 	return configInfo;
 }
