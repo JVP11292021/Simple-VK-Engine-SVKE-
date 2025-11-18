@@ -27,15 +27,6 @@ void Pipeline::bind(VkCommandBuffer commandBuffer) {
 PipelineConfInfo Pipeline::defaultPipelineConfigInfo(std::uint32_t w, std::uint32_t h) {
 	PipelineConfInfo configInfo{};
 
-	configInfo.assemblyInputInfo = {};
-	configInfo.rasterizationInfo = {};
-	configInfo.multisampleInfo = {};
-	configInfo.colorBlendAttachment = {};
-	configInfo.colorBlendInfo = {};
-	configInfo.depthStencilInfo = {};
-	configInfo.viewport = {};
-	configInfo.scissor = {};
-
 	configInfo.assemblyInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	configInfo.assemblyInputInfo.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	configInfo.assemblyInputInfo.primitiveRestartEnable = VK_FALSE;
