@@ -5,6 +5,7 @@
 #include "Window.hpp"
 #include "SwapChain.hpp"
 #include "Pipeline.hpp"
+#include "Model.hpp"
 
 #include <memory>
 #include <stdexcept>
@@ -16,6 +17,7 @@ public:
 	static constexpr std::int32_t HEIGHT = 600;
 
 	FirstApp() {
+		this->loadModels();
 		this->createPipelineLayout();
 		this->createPipeline();
 		this->createCommandBuffers();
@@ -37,6 +39,16 @@ public:
 		vkDeviceWaitIdle(this->device.device());
 	}
 private:
+	void loadModels() {
+		std::vector<vle::ShaderModel::Vertex> vertices = {
+			{{0.0, -0.5f}},
+			{{0.5f, 0.5f}},
+			{{-0.5f, 0.5f}}
+		};
+		
+		this->model = std::make_unique<vle::ShaderModel>(this->device, vertices);
+	}
+
 	void createPipelineLayout() {
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
 		pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -94,7 +106,8 @@ private:
 			vkCmdBeginRenderPass(this->commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			this->pipeline->bind(this->commandBuffers[i]);
-			vkCmdDraw(this->commandBuffers[i], 3, 1, 0, 0);
+			this->model->bind(this->commandBuffers[i]);
+			this->model->draw(this->commandBuffers[i]);
 
 			vkCmdEndRenderPass(this->commandBuffers[i]);
 			if (vkEndCommandBuffer(this->commandBuffers[i]) != VK_SUCCESS) {
@@ -124,6 +137,7 @@ private:
 	std::unique_ptr<vle::Pipeline> pipeline;
 	VkPipelineLayout pipelineLayout;
 	std::vector<VkCommandBuffer> commandBuffers;
+	std::unique_ptr<vle::ShaderModel> model;
 };
 
 int main() {

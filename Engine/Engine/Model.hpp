@@ -33,10 +33,10 @@ private:
 	void createVertexBuffers(const std::vector<Vertex>& vertices);
 
 private:
-	EngineDevice& device;
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
-	std::uint32_t vertexCount;
+	EngineDevice& _device;
+	VkBuffer _vertexBuffer;
+	VkDeviceMemory _vertexBufferMemory;
+	std::uint32_t _vertexCount;
 };
 
 VLE_NS_E

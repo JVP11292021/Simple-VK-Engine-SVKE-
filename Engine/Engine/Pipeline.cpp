@@ -1,5 +1,7 @@
 #include "Pipeline.hpp"
 
+#include "Model.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -139,42 +141,37 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	shaderStages[1].module = this->_fragShaderModule;
 	shaderStages[1].pName = "main";
+	
+	auto bindingDescriptions = ShaderModel::Vertex::getBindingDescription();
+	auto attributeDescriptions = ShaderModel::Vertex::getAttributeDescription();
 
-	// Make local copies of config create-info objects, value-initialized
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-	vertexInputInfo.vertexAttributeDescriptionCount = 0;
-	vertexInputInfo.vertexBindingDescriptionCount = 0;
-	vertexInputInfo.pVertexAttributeDescriptions = nullptr;
-	vertexInputInfo.pVertexBindingDescriptions = nullptr;
+	vertexInputInfo.vertexAttributeDescriptionCount = static_cast<std::uint32_t>(attributeDescriptions.size());
+	vertexInputInfo.vertexBindingDescriptionCount = static_cast<std::uint32_t>(bindingDescriptions.size());
+	vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+	vertexInputInfo.pVertexBindingDescriptions = bindingDescriptions.data();
 
 	VkPipelineViewportStateCreateInfo viewportInfo{};
 	viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	viewportInfo.viewportCount = 1;
-	viewportInfo.pViewports = &configInfo.viewport; // viewport is a plain VkViewport inside configInfo
+	viewportInfo.pViewports = &configInfo.viewport;
 	viewportInfo.scissorCount = 1;
 	viewportInfo.pScissors = &configInfo.scissor;
 
-	// Copy and explicitly value-initialize the attachment and color blend info
 	VkPipelineColorBlendAttachmentState colorBlendAttachment = configInfo.colorBlendAttachment;
 	VkPipelineColorBlendStateCreateInfo colorBlendInfo = configInfo.colorBlendInfo;
 	colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
-	colorBlendInfo.pAttachments = &colorBlendAttachment; // point to the local copy
-
-	// Copy other infos to locals and set sType etc. (be explicit)
+	colorBlendInfo.pAttachments = &colorBlendAttachment;
 	VkPipelineInputAssemblyStateCreateInfo inputAssembly = configInfo.assemblyInputInfo;
 	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
-
 	VkPipelineRasterizationStateCreateInfo rasterization = configInfo.rasterizationInfo;
 	rasterization.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
-
 	VkPipelineMultisampleStateCreateInfo multisample = configInfo.multisampleInfo;
 	multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-
 	VkPipelineDepthStencilStateCreateInfo depthStencil = configInfo.depthStencilInfo;
 	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 
-	// Build the final pipeline create info, value-initialized
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
@@ -194,7 +191,6 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = -1;
 
-	// Finally call vkCreateGraphicsPipelines
 	if (vkCreateGraphicsPipelines(this->_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &this->_gfxPipeline) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create a successful graphics pipeline");
 	}
