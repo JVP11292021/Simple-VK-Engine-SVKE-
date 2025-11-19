@@ -62,8 +62,11 @@ private:
 	}
 
 	void loadModels() {
-		std::vector<vle::ShaderModel::Vertex> vertices{};
-		sierpinski(vertices, 5, { -0.5f, 0.5f }, { 0.5f, 0.5f }, { 0.0f, -0.5f });
+		std::vector<vle::ShaderModel::Vertex> vertices{
+			{{ -0.5f, 0.5f }, {1.0f, 0.0f, 0.0f}},
+			{{ 0.5f, 0.5f }, {0.0f, 1.0f, 0.0f}},
+			{{ 0.0f, -0.5f }, {0.0f, 0.0f, 1.0f}}
+		};
 		this->model = std::make_unique<vle::ShaderModel>(this->device, vertices);
 	}
 
