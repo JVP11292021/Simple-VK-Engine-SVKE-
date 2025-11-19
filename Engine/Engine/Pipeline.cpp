@@ -128,25 +128,19 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	this->createShaderModule(vertCode, &this->_vertShaderModule);
 	this->createShaderModule(fragCode, &this->_fragShaderModule);
 
-	VkPipelineShaderStageCreateInfo shaderStages[2];
+	VkPipelineShaderStageCreateInfo shaderStages[2]{};
 	// Vertex
 	shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
 	shaderStages[0].module = this->_vertShaderModule;
 	shaderStages[0].pName = "main";
-	shaderStages[0].flags = 0;
-	shaderStages[0].pNext = nullptr;
-	shaderStages[0].pSpecializationInfo = nullptr;
-
 	// Fragment
 	shaderStages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 	shaderStages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
 	shaderStages[1].module = this->_fragShaderModule;
 	shaderStages[1].pName = "main";
-	shaderStages[1].flags = 0;
-	shaderStages[1].pNext = nullptr;
-	shaderStages[1].pSpecializationInfo = nullptr;
 
+	// Make local copies of config create-info objects, value-initialized
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vertexInputInfo.vertexAttributeDescriptionCount = 0;
@@ -157,33 +151,52 @@ void Pipeline::createGfxPipeline(const std::string& vertFilePath, const std::str
 	VkPipelineViewportStateCreateInfo viewportInfo{};
 	viewportInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	viewportInfo.viewportCount = 1;
-	viewportInfo.pViewports = &configInfo.viewport;
+	viewportInfo.pViewports = &configInfo.viewport; // viewport is a plain VkViewport inside configInfo
 	viewportInfo.scissorCount = 1;
 	viewportInfo.pScissors = &configInfo.scissor;
 
+	// Copy and explicitly value-initialize the attachment and color blend info
+	VkPipelineColorBlendAttachmentState colorBlendAttachment = configInfo.colorBlendAttachment;
+	VkPipelineColorBlendStateCreateInfo colorBlendInfo = configInfo.colorBlendInfo;
+	colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+	colorBlendInfo.pAttachments = &colorBlendAttachment; // point to the local copy
+
+	// Copy other infos to locals and set sType etc. (be explicit)
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly = configInfo.assemblyInputInfo;
+	inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+
+	VkPipelineRasterizationStateCreateInfo rasterization = configInfo.rasterizationInfo;
+	rasterization.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+
+	VkPipelineMultisampleStateCreateInfo multisample = configInfo.multisampleInfo;
+	multisample.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+
+	VkPipelineDepthStencilStateCreateInfo depthStencil = configInfo.depthStencilInfo;
+	depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+
+	// Build the final pipeline create info, value-initialized
 	VkGraphicsPipelineCreateInfo pipelineInfo{};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.stageCount = 2;
 	pipelineInfo.pStages = shaderStages;
 	pipelineInfo.pVertexInputState = &vertexInputInfo;
-
-	pipelineInfo.pInputAssemblyState = &configInfo.assemblyInputInfo;
+	pipelineInfo.pInputAssemblyState = &inputAssembly;
 	pipelineInfo.pViewportState = &viewportInfo;
-	pipelineInfo.pRasterizationState = &configInfo.rasterizationInfo;
-	pipelineInfo.pMultisampleState = &configInfo.multisampleInfo;
-	pipelineInfo.pColorBlendState = &configInfo.colorBlendInfo;
-	pipelineInfo.pDepthStencilState = &configInfo.depthStencilInfo;
+	pipelineInfo.pRasterizationState = &rasterization;
+	pipelineInfo.pMultisampleState = &multisample;
+	pipelineInfo.pColorBlendState = &colorBlendInfo;
+	pipelineInfo.pDepthStencilState = &depthStencil;
 	pipelineInfo.pDynamicState = nullptr;
 
 	pipelineInfo.layout = configInfo.pipelineLayout;
 	pipelineInfo.renderPass = configInfo.renderPass;
 	pipelineInfo.subpass = configInfo.subpass;
-
-	pipelineInfo.basePipelineIndex = -1;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+	pipelineInfo.basePipelineIndex = -1;
 
+	// Finally call vkCreateGraphicsPipelines
 	if (vkCreateGraphicsPipelines(this->_device.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &this->_gfxPipeline) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create a successfull graphics pipeline");
+		throw std::runtime_error("Failed to create a successful graphics pipeline");
 	}
 }
 
