@@ -43,30 +43,33 @@ private:
 		std::vector<vle::ShaderModel::Vertex>& vertices,
 		int depth,
 		glm::vec2 left,
+		glm::vec3 leftColor,
 		glm::vec2 right,
-		glm::vec2 top
+		glm::vec3 rightColor,
+		glm::vec2 top,
+		glm::vec3 topColor
 	) {
 		if (depth <= 0) {
-			vertices.push_back({ top });
-			vertices.push_back({ right });
-			vertices.push_back({ left });
+			vertices.push_back({ top, topColor });
+			vertices.push_back({ right, rightColor });
+			vertices.push_back({ left, leftColor });
 		}
 		else {
-			auto leftTop = 0.5f * (left + top);
-			auto rightTop = 0.5f * (right + top);
-			auto leftRight = 0.5f * (left + right);
-			sierpinski(vertices, depth - 1, left, leftRight, leftTop);
-			sierpinski(vertices, depth - 1, leftRight, right, rightTop);
-			sierpinski(vertices, depth - 1, leftTop, rightTop, top);
+			glm::vec2 leftTop = 0.5f * (left + top);
+			glm::vec2 rightTop = 0.5f * (right + top);
+			glm::vec2 leftRight = 0.5f * (left + right);
+			glm::vec3 leftTopColor = 0.5f * (leftColor + topColor);
+			glm::vec3 rightTopColor = 0.5f * (rightColor + topColor);
+			glm::vec3 leftRightColor = 0.5f * (leftColor + rightColor);
+			sierpinski(vertices, depth - 1, left, leftColor, leftRight, leftRightColor, leftTop, topColor);
+			sierpinski(vertices, depth - 1, leftRight, leftRightColor, right, rightColor, rightTop, rightTopColor);
+			sierpinski(vertices, depth - 1, leftTop, leftTopColor, rightTop, rightTopColor, top, topColor);
 		}
 	}
 
 	void loadModels() {
-		std::vector<vle::ShaderModel::Vertex> vertices{
-			{{ -0.5f, 0.5f }, {1.0f, 0.0f, 0.0f}},
-			{{ 0.5f, 0.5f }, {0.0f, 1.0f, 0.0f}},
-			{{ 0.0f, -0.5f }, {0.0f, 0.0f, 1.0f}}
-		};
+		std::vector<vle::ShaderModel::Vertex> vertices{};
+		sierpinski(vertices, 5, { -0.5f, 0.5f }, { 1.0f, 0.0f, 0.0f }, { 0.5f, 0.5f }, { 0.0f, 1.0f, 0.0f }, { 0.0f, -0.5f }, { 0.0f, 0.0f, 1.0f });
 		this->model = std::make_unique<vle::ShaderModel>(this->device, vertices);
 	}
 
